@@ -1,0 +1,226 @@
+First name: Zijie
+Last name: Deng
+ID: 883871989
+
+January 23rd 2016:
+	create room.h and room.c
+		1. Built Room: typedef struct
+		2. The method for randomly generating a room: Room* getRandRoom();
+			w represents width, at least 3 units and at most 30 units, 
+			h represents hight, at least 2 units and at most 15 units. 
+	   		x represents x coordinate of room's top right point.
+	   		y represnets y coordinate of room's top right point.
+		3. The method for judging whether two rooms can coexist.
+			 int coexist(Room* room1, Room* room2);
+			 Return 1 if coexist and 0 if not.
+	
+	Started main.c
+		1. Declaring a 2D array: char matrix[80][21];
+		2. Creating a Room* and using printf to test getRandRoom();
+		3. Creating a method to fill up this 2D array with '+',
+			checking if the dungeon is created.
+			By using: void constructMatrix();
+		4. Creating a method to print out a room randomly generated.
+			By using: void placeRoom(Room* room);
+		5. Creating a method to print out the whole dungeon.
+			By using: void printMatrix();
+
+	Started and finish makefile
+		for main.c room.c room.h
+
+January 24th 2016:
+	Continue to modify room.h and room.c
+		1. The method for checking if two rooms can coexist: 
+			int coexist(Room* room1, Room* room2);
+			Requiring two rooms aren't the same room, 
+			and they cannot contact one another.
+			There must be at least 1 cell of non-room 
+			between any two different rooms. 
+		2. The method for finding the centroid point of a room: 
+			void getCentroid(int*, int*, Room*);
+			Preparing for building path between two rooms.
+
+	Continue to modify main.c
+		1. Moving and defining 2D array matrix outside main.
+			char matrix[NUM_ROW][NUM_COL];
+		2. Creating an array to store all the rooms. 
+			Room* arr[ARR_SIZE];
+		3. Creating a method for cheking if current room coexist 
+			with all the rooms that exist in arr.
+			int coexistAll(Room* room, int number);
+			Return 1 if coexist and 0 if not.
+		4. Writing a while loop to to limit attempts of trying within 2000,
+			whose aim is to fill up the arr with all rooms coexist.
+		
+		
+January 25th 2016:
+	Continue to modify room.h and room.c
+		1. Put method getCentroid(int*, int*, Room*) into another method.
+		2. The method for building path between two rooms.
+			void connect(Room* room1, Room* room2, char matrix[NUM_ROW][NUM_COL]);
+			(1)Find the centroid points from two rooms.(x1, y1)and(x2,y2).
+			(2)Calculate the difference between these two points. x and y.
+			(3)Creating an array of int to identify which direction to move
+			    by declaring an int as length for an array, 
+				which is the absolute value of x plus that of y.
+				x is represented by 0, y is represented by 1.
+			(4)Randomly choose directions.
+				by Writing a helper method to reorganize the array.
+				static void shuffle(int length, int* arr)
+
+	Cotinue to modify main.c
+		1. Connecing all the rooms with the first room, in a for loop.
+		2. Write debug.
+		3. Change'+' to ' '.	
+	
+	Continue to write room.h and room.c
+		1. Continue working on method: 
+			connect(Room* room1, Room* room2, char matrix[NUM_ROW][NUM_COL]);
+			Print out the path with '#' according to the directions,
+			which is stored in array.
+			And no '#' in rooms.
+	
+	Finish project.
+
+January 29th 2016:
+	1. Create dungeon.c and move and change main.c to dungeon.c as a method:
+		int dungeon_random();
+	2. Create dungeon.h and move all "#include <>" and "#define" into it.
+	3. Create main.c that can check swiches and call methods in dungeon.c:
+		(1) Check argv equals to "--load", "--save", "--debug", or an number
+		input by user.
+		(2) According to the condition, call dungeon_load(char**), 
+		dungeon_random().
+
+January 31st 2016:
+	1. Implement method dungeon_load(char**): 
+		(1) Take a filename.
+		(2) read the first 6 bytes with value RLG327.
+		(3) read the bytes from 6 to 9 with value 0 as file version.
+		(4) read the bytes from 10 to 13 as integer size of the file.
+		(5) read the bytes from 14 to 1495 as the hardness value, ranging 
+			from 0 to 255, for each element in matrix except boarder, 255.
+		(6) read the bytes from 1495 to end, every 4 unsigned 8-bit integer
+			as x,y, w, h.
+		(7) get room numbers by using size minus 1495.
+		(8) write a for loop to the x, y, w, h for each room and place room.		(9) according to harness, the bytes from 14 to 1495, to place path.
+
+February 1st 2016:
+	1. add hardness for each char in matrix in dungeon_random():
+		(1) create a 2D array h_matrix[21][80] to store hardness.
+		(2) random number from 1 to 254 for all the char in matrix.
+		(3) put 0 into h_matrix as hardness for rooms and pathes.
+	2. Create method for --save: dungeon_save();
+	2. Create method for --save: dungeon_save();
+
+February 5th 2016:
+	1. Create pathFinding.c
+		(1) create point: 
+			typedef short Point;
+			Point makePoint(char x, char y);
+		(2) create method to get x coordinate, and y coordinate:
+			char getX(Point);
+			char getY(Point);
+		
+February 6th 2016:
+	1. Continue to modify pathFinding.c
+		(1) compare the distance of two points:
+			the method for non-tunneling monsters:
+				int32_t compareN(const void *key, const void *with);
+			the method for tunnelers:
+				int32_t compareT(const void *key, const void *with);
+		(2) create method for assigning distance from pc to the rest of points in dungeon:
+			the method for non-tunneling monsters:
+				void pathFindingN(Point*);
+		(3) create method for choosing the neighbor points around the choosing point:
+			Point* getNeighbors(Point);
+		(4) create method for getting weight according to hardness:
+			int getWeight(Point);
+
+February 12th 2016:
+	1. Continue to modify pathFinding.c
+		(1) finding problem in method pathFindingN(Point*), which is about address.
+		(2) change "typedef short point" to "typedef struct{} Point";
+		(3) change the retrun type of makePoint to Point*;
+		(3) delet getX(); and getY(); since I can directly use point->x and point->y;
+		(4) change Point to Point* in getNeighbor(Point); pathFindingN(Point); and getWeight(Point);	
+		(5)	move makePoint, getNeighbors and getWeight methods to helper.c and include them in helper.h
+		(6) finish pathFindingN(Point);
+		(7) create the method for tunneling monsters:
+			void pathFindingT(Point*);
+	2. Change in main.c
+		(1) add "--pc" to switch to get the x coordinate and y coordinate.
+		(2) test.	
+
+February 19th 2016:
+	1. Create character.c
+		(1) create characters in character.h:
+			typedef struct {} Character;
+			Character* createCharacter(int);
+		(2) create an 2D array of characters:
+			Character* c_matrix[21][80];		
+		(3) the method for placing characters by assigning random Locations:
+			(this method is to first randomly chose a room,secondly 
+			randomly chose x-coordinate and y-coordinate in that room.)
+			void assignRandomLocation(Character*);
+	2. Change in main.c:
+		(1) test out createCharacter(int) by creating a PC in main.c
+			if there is no x-coordinate and y-coordinate given by user.
+		(2) declare Character* PC in character.h.
+		(3) trying to move the PC in dungeon, by writing a while loop.
+	3. Continue to modify character.c:
+		(1) chose a targeted poit and move character to that point:
+			void go(Character*, int, int);
+
+February 20th 2016:
+	1. Continue to modify main.c
+		(1) add swiches "--nummon".
+		(2) declare numMonster to be 5 as default.
+	2. Continue to modify character.c
+		(1) create an array of monsters in character.h:
+			Character* monster; 
+	3. Continue to modify main.c
+		(1) put monsters in dungeon and make them move randomly. 
+		add a for loop in whil loop in main.c to move all monsters randomly.
+	4. Continue to modify character.c
+		(1)	the method for converting decimal to char from 1 to f:
+			char getChar(Character*);
+	
+February 21th 2016:
+	1. Continue on character.c
+		(1) the method for remove the character, 
+		which means that the new arrival kills the original occupant.
+			void removeMonster(Character* character);
+		(2) call removeMonster() in go() to test out;
+		(3) delcare an Extern int killedPC in character.h
+		to keep track on whether PC is removed.
+		(4) the method for all monsters moving direction:
+			void goMonster(Character*);
+		(5) determine in go() whether the monster is tunneler or not.
+		(6) the method for moving according to different kinds of abilities:
+			void			 
+			(a) the ability of telepathy:
+			void goTelepathy(Character* character);		 
+			(b) the ability of Intelligence:
+			void goDijkstra(Character* character);	
+		(7) determine and call goRandom(),  goTelepathy() and goDijkstra()
+		in goMonster().
+	2. Continue on main.c
+		(1) call pathFinding() in while loop to update current PC location
+		and distance maps.
+		(2) change goRandom() to goMonster() and test out.
+
+February 22th 2016:
+	1. 
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+					
